@@ -1,5 +1,5 @@
 /* eslint-disable react/display-name */
-import {API_KEY, USER_ID, USER_TOKEN} from "@env"
+import {API_KEY, USER_ID, USER_TOKEN} from '@env';
 import React, {useContext, useEffect, useMemo, useState} from 'react';
 import {
   LogBox,
@@ -24,6 +24,7 @@ import {
   Channel,
   ChannelList,
   Chat,
+  Edit,
   MessageInput,
   MessageList,
   OverlayProvider,
@@ -36,6 +37,8 @@ import {useStreamChatTheme} from './useStreamChatTheme';
 import {InputBox} from './src/components/InputBox';
 import {VoiceMessageAttachment} from './src/components/VoiceMessageAttachment';
 import {ListPreviewMessage} from './src/components/ListPreviewMessage';
+import {MessageWithPoll} from './src/components/MessageWithPoll';
+import {CustomAttachments} from './src/components/CustomAttachments';
 
 LogBox.ignoreAllLogs(true);
 
@@ -103,7 +106,58 @@ const ChannelScreen = ({navigation}) => {
           channel={channel}
           keyboardVerticalOffset={headerHeight}
           Input={InputBox}
-          Card={VoiceMessageAttachment}
+          Card={CustomAttachments}
+          messageActions={({
+            blockUser, // MessageAction | null;
+            canModifyMessage, // boolean;
+            copyMessage, // MessageAction | null;
+            deleteMessage, // MessageAction | null;
+            dismissOverlay, // () => void;
+            editMessage, // MessageAction | null;
+            error, // boolean;
+            flagMessage, // MessageAction | null;
+            isMyMessage, // boolean;
+            isThreadMessage, // boolean;
+            message, // MessageType<At, Ch, Co, Ev, Me, Re, Us>;
+            messageReactions, // boolean;
+            muteUser, // MessageAction | null;
+            quotedReply, // MessageAction | null;
+            retry, // MessageAction | null;
+            threadReply, // MessageAction | null;
+            repliesEnabled, // boolean;
+          }) => {
+            const attachments = message.attachments || [];
+            const ownReactions = message.own_reactions || [];
+            const vote = ownReactions.find(
+              reaction => reaction.type.indexOf('option') === 0,
+            );
+            let retractAction = [];
+            if (attachments[0]?.type === 'poll' && !!vote) {
+              retractAction = [
+                {
+                  icon: <Edit pathFill="#7A7A7A" />,
+                  title: 'Retract Vote',
+                  action: () => {
+                    channel.deleteReaction(message.id, vote.type);
+                    dismissOverlay();
+                  },
+                },
+              ];
+            }
+
+            if (isMyMessage) {
+              return [
+                ...retractAction,
+                quotedReply,
+                threadReply,
+                editMessage,
+                copyMessage,
+                deleteMessage,
+              ];
+            } else {
+              return [...retractAction, quotedReply, threadReply, copyMessage];
+            }
+          }}
           thread={thread}>
           <View style={{flex: 1}}>
             <MessageList

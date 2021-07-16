@@ -112,6 +112,38 @@ export const InputBox = () => {
     await sendVoiceMessage(result);
   };
 
+  const sendPoll = async () => {
+    const message = {
+      text: 'What food would you like?',
+      attachments: [
+        {
+          type: 'poll',
+          multipleChoiceVote: false,
+          votingOptions: [
+            {
+              id: 'option1',
+              value: 'Pizza',
+            },
+            {
+              id: 'option2',
+              value: 'Indian Curry',
+            },
+            {
+              id: 'option3',
+              value: 'Dutch Sandwiches',
+            },
+            {
+              id: 'option4',
+              value: 'Stakes',
+            },
+          ],
+        },
+      ],
+    };
+
+    await channel.sendMessage(message);
+  };
+
   const emptyInput =
     !text && !imageUploads.length && !fileUploads.length && !giphyActive;
 
@@ -122,7 +154,7 @@ export const InputBox = () => {
       <View style={[styles.fullWidth, styles.row, styles.inputContainer]}>
         {!recordingActive ? (
           <View style={[styles.flex, styles.row]}>
-            <AttachButton handleOnPress={toggleAttachmentPicker} />
+            <AttachButton handleOnPress={() => sendPoll()} />
             <View style={styles.autoCompleteInputContainer}>
               <AutoCompleteInput />
             </View>

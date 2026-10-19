@@ -1,3 +1,5 @@
+> **This repository is archived and no longer maintained.** For a current alternative, see [the stream-chat-react-native SampleApp](https://github.com/GetStream/stream-chat-react-native/tree/develop/examples/SampleApp).
+
 # Voice Message Example For React Native Chat
 
 Basic example of how to implement voice message feature using Stream chat and [react-native-audio-recorder-player](https://github.com/hyochan/react-native-audio-recorder-player)
